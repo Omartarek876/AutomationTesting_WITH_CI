@@ -1,0 +1,17 @@
+{
+  "home": {
+    "title": "Automation",
+    "subtitle": "Full-Fledged practice website for Automation Engineers",
+    "accountCreated": "ACCOUNT CREATED!",
+    "accountDeleted": "ACCOUNT DELETED!"
+  },
+  "login": {
+    "formTitle": "Login to your account",
+    "invalidCredentials": "Your email or password is incorrect!"
+  },
+  "registration": {
+    "signupTitle": "New User Signup!",
+    "accountInformationTitle": "ENTER ACCOUNT INFORMATION",
+    "existingEmail": "Email Address already exist!"
+  }
+}

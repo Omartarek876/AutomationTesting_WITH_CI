@@ -1,6 +1,5 @@
 package utils;
 
-import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -27,7 +26,7 @@ public class ElementActions {
     }
 
     public static List<WebElement> getElements(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds", "30"))));
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
@@ -36,7 +35,6 @@ public class ElementActions {
     }
 
     /////////////////////////////////////////////Mouse Methods//////////////////////////////////////////////////
-    @Step("Click on element located in : [{locator}]")
     public static void clickElement(By locator) {
         getElement(locator).click();
     }
@@ -115,7 +113,6 @@ public class ElementActions {
     }
 
     /////////////////////////////////////////////Keyboard Methods//////////////////////////////////////////////////
-    @Step("Enter text [{text}] in element located in [{locator}]")
     public static void typeText(By locator, String text) {
         getElement(locator).sendKeys(text);
     }

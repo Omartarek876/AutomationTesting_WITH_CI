@@ -5,57 +5,84 @@ import org.testng.annotations.*;
 import utils.*;
 import POM.pages.*;
 
+import java.time.Instant;
+import java.util.Map;
+
 @Listeners(utils.TestNgListener.class)
 @Feature("Register Feature")
+@Story("Register and manage a test account")
 public class RegisterTests {
     HomePage homePage;
     RegisterUserPage registerUserPage;
-    JsonFileManager jsonData;
+    JsonFileManager registrationData;
+    JsonFileManager uiMessages;
+    Map<String, Object> newUserData;
+    Map<String, Object> existingUserData;
 
-    @Test
-    public void TC01_registerUser() {
-        registerUserPage.sighupUser(jsonData.getTestData("$.userData.userName"), jsonData.getTestData("$.userData.email"))
-                         .assertOnSignupFormTitle2("ENTER ACCOUNT INFORMATION")
+    @Test(description = "Register a new user and verify the account lifecycle")
+    @Description("Creates a unique account, verifies the signed-in state, and removes the test account.")
+    @Severity(SeverityLevel.CRITICAL)
+    public void registerUserAndVerifyAccountLifecycle() {
+        String uniqueSuffix = Long.toString(Instant.now().toEpochMilli());
+        String userName = value("userName") + uniqueSuffix;
+        String email = value("email").replace("@", "+" + uniqueSuffix + "@");
+        registerUserPage.signupUser(userName, email)
+                         .assertOnSignupFormTitle2(uiMessages.getTestData("$.registration.accountInformationTitle"))
                          .enterAccountInformation(
-                jsonData.getTestData("$.userData.title"),
-                jsonData.getTestData("$.userData.password"),
-                jsonData.getTestData("$.userData.day"),
-                jsonData.getTestData("$.userData.month"),
-                jsonData.getTestData("$.userData.year"),
-                Boolean.parseBoolean(jsonData.getTestData("$.userData.newsletter")),
-                Boolean.parseBoolean(jsonData.getTestData("$.userData.specialOffers"))
+                value("title"),
+                value("password"),
+                value("day"),
+                value("month"),
+                value("year"),
+                parseCheckboxValue(value("newsletter")),
+                parseCheckboxValue(value("specialOffers"))
         );
 
         registerUserPage.enterAddressInformation(
-                jsonData.getTestData("$.userData.firstName"),
-                jsonData.getTestData("$.userData.lastName"),
-                jsonData.getTestData("$.userData.company"),
-                jsonData.getTestData("$.userData.address1"),
-                jsonData.getTestData("$.userData.address2"),
-                jsonData.getTestData("$.userData.country"),
-                jsonData.getTestData("$.userData.state"),
-                jsonData.getTestData("$.userData.city"),
-                jsonData.getTestData("$.userData.zipcode"),
-                jsonData.getTestData("$.userData.mobileNumber")
+                value("firstName"),
+                value("lastName"),
+                value("company"),
+                value("address1"),
+                value("address2"),
+                value("country"),
+                value("state"),
+                value("city"),
+                value("zipcode"),
+                value("mobileNumber")
         );
         homePage
-                .assertOnAccountCreatedTitle("ACCOUNT CREATED!")
+                .assertOnAccountCreatedTitle(uiMessages.getTestData("$.home.accountCreated"))
                 .clickOnContinueButton()
-                .assertOnExpectedLoggedInUser(jsonData.getTestData("$.userData.userName"))
+                .assertOnExpectedLoggedInUser(userName)
                 .clickOnDeleteAccountButton()
-                .assertOnAccountDeletedTitle("ACCOUNT DELETED!")
+                .assertOnAccountDeletedTitle(uiMessages.getTestData("$.home.accountDeleted"))
                 .clickOnContinueButton();
     }
 
-    @Test
-    public void TC05_RegisterUserWithExistingEmail() {
-        registerUserPage.sighupUser(jsonData.getTestData("$.existingUserData.userName"), jsonData.getTestData("$.existingUserData.email"))
-                        .assertOnExistingAccountMessage("Email Address already exist!");
+    private boolean parseCheckboxValue(String value) {
+        return switch (value.trim().toLowerCase()) {
+            case "true", "check", "checked", "yes" -> true;
+            case "false", "uncheck", "unchecked", "no" -> false;
+            default -> throw new IllegalArgumentException("Unsupported checkbox value: " + value);
+        };
+    }
+
+    @Test(description = "Reject an email address that already has an account")
+    @Description("The signup form should explain that an existing email address cannot be registered again.")
+    @Severity(SeverityLevel.NORMAL)
+    public void rejectRegistrationWithExistingEmail() {
+        registerUserPage.signupUser(
+                        requiredValue(existingUserData, "userName"),
+                        requiredValue(existingUserData, "email"))
+                .assertOnExistingAccountMessage(uiMessages.getTestData("$.registration.existingEmail"));
     }
 
     @BeforeClass
-    public void setup(){
-        jsonData = new JsonFileManager("src/test/resources/RegistrationData.json");
+    public void loadTestData() {
+        registrationData = new JsonFileManager("RegistrationData.json");
+        uiMessages = new JsonFileManager("uiMessages.json");
+        newUserData = registrationData.getObject("$.userData");
+        existingUserData = registrationData.getObject("$.existingUserData");
     }
 
     @BeforeMethod
@@ -64,9 +91,11 @@ public class RegisterTests {
         homePage = new HomePage();
         registerUserPage = new RegisterUserPage();
         homePage.navigate(System.getProperty("baseUrl"));
-        homePage.assertOnPageTitles("Automation", "Full-Fledged practice website for Automation Engineers");
+        homePage.assertOnPageTitles(
+                uiMessages.getTestData("$.home.title"),
+                uiMessages.getTestData("$.home.subtitle"));
         homePage.clickOnSignupButton();
-        registerUserPage.assertOnSignupFormTitle1("New User Signup!");
+        registerUserPage.assertOnSignupFormTitle1(uiMessages.getTestData("$.registration.signupTitle"));
     }
 
     @AfterMethod
@@ -74,8 +103,15 @@ public class RegisterTests {
         DriverFactory.quitDriver();
     }
 
-    @AfterClass
-    public void tearDown(){
-        System.out.println("Tear down...");
+    private String value(String key) {
+        return requiredValue(newUserData, key);
+    }
+
+    private String requiredValue(Map<String, Object> data, String key) {
+        Object value = data.get(key);
+        if (value == null || String.valueOf(value).isBlank()) {
+            throw new IllegalArgumentException("Missing required registration data: " + key);
+        }
+        return String.valueOf(value);
     }
 }

@@ -12,12 +12,12 @@ public class BrowserUtils {
         return DriverFactory.getDriver();
     }
 
-    @Step("Navigate to Url : [{url}]")
+    @Step("Navigate to the configured application URL")
     public static void navigateToUrl(String url) {
         driver().navigate().to(url);
     }
 
-    public static String GetCurrentUrl() {
+    public static String getCurrentUrl() {
         return driver().getCurrentUrl();
     }
 

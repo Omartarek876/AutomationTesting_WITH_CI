@@ -31,26 +31,29 @@ public class RegisterUserPage {
     private By zipcodeInput = By.id("zipcode");
     private By mobileNumberInput = By.id("mobile_number");
     private By createAccountBtn = By.xpath("//button[@data-qa='create-account']");
-    private By invalidLoginErrorMessage = By.xpath("//p[@style='color: red;']");
+    private By existingAccountErrorMessage = By.xpath("//p[@style='color: red;']");
 
 
-    public RegisterUserPage sighupUser(String userName, String email) {
+    @Step("Submit the initial signup details")
+    public RegisterUserPage signupUser(String userName, String email) {
         ElementActions.typeText(userNameField, userName);
         ElementActions.typeText(emailField, email);
         ElementActions.clickElement(signupButton);
         return this;
     }
 
+    @Step("Complete the account information")
     public RegisterUserPage enterAccountInformation(String title, String password, String day,
-                                        String month, String year, Boolean Newsletter, Boolean SpecialOffers) {
+                                        String month, String year, boolean newsletter, boolean specialOffers) {
         selectUserTitle(title);
         ElementActions.typeText(passwordInput, password);
         selectDateOfBirth(day, month, year);
-        checkNewsletter(Newsletter);
-        checkSpecialOffers(SpecialOffers);
+        checkNewsletter(newsletter);
+        checkSpecialOffers(specialOffers);
         return this;
     }
 
+    @Step("Complete the address details and create the account")
     public RegisterUserPage enterAddressInformation(String firstName, String lastName, String company, String address1, String address2,
                                         String country, String state, String city, String zipcode, String mobileNumber) {
         ElementActions.typeText(firstNameInput, firstName);
@@ -58,7 +61,7 @@ public class RegisterUserPage {
         ElementActions.typeText(companyInput, company);
         ElementActions.typeText(address1Input, address1);
         ElementActions.typeText(address2Input, address2);
-        ElementActions.typeText(countrySelect, country);
+        ElementActions.selectDropdownByVisibleText(countrySelect, country);
         ElementActions.typeText(stateInput, state);
         ElementActions.typeText(cityInput, city);
         ElementActions.typeText(zipcodeInput, zipcode);
@@ -73,7 +76,7 @@ public class RegisterUserPage {
         } else if (title.toLowerCase().trim().equals("mrs")) {
             ElementActions.selectRadioButton(mrsTitleRadio);
         } else {
-            System.out.println("Invalid Title");
+            throw new IllegalArgumentException("Unsupported account title: " + title);
         }
         return this;
     }
@@ -103,21 +106,27 @@ public class RegisterUserPage {
         return this;
     }
 
-    @Step ("verify signup form title1 is [{signupTitle1}]")
+    @Step("Verify the signup form heading")
     public RegisterUserPage assertOnSignupFormTitle1(String signupTitle1) {
-        Assert.assertEquals(ElementActions.getText(signupFormTitle1), signupTitle1);
+        Assert.assertEquals(
+                ElementActions.getText(signupFormTitle1), signupTitle1,
+                "Signup form heading did not match the expected text");
         return this;
     }
 
-    @Step ("verify signup form title2 is [{signupTitle2}]")
+    @Step("Verify the account-information heading")
     public RegisterUserPage assertOnSignupFormTitle2(String signupTitle2) {
-        Assert.assertEquals(ElementActions.getText(signupFormTitle2), signupTitle2);
+        Assert.assertEquals(
+                ElementActions.getText(signupFormTitle2), signupTitle2,
+                "Account-information heading did not match the expected text");
         return this;
     }
 
-    @Step("verify that the user [{invalidLoginMessage}] is already exsited")
+    @Step("Verify that the email address is already registered")
     public RegisterUserPage assertOnExistingAccountMessage(String invalidLoginMessage) {
-        Assert.assertEquals(ElementActions.getText(invalidLoginErrorMessage), invalidLoginMessage);
+        Assert.assertEquals(
+                ElementActions.getText(existingAccountErrorMessage), invalidLoginMessage,
+                "The signup form did not show the expected existing-email message");
         return this;
     }
 }

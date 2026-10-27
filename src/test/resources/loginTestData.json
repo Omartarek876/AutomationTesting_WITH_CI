@@ -1,13 +1,15 @@
 {
-  "validLogin": {
-    "email": "Omarr3@gmail.com",
-    "password": "omar1234",
-    "userName": "Omar3"
-  },
-
-  "invalidLogin": {
-    "email": "ddOmarr3@gmail.com",
-    "password": "ddomar1234",
-    "userName": "ddOmar3"
+  "loginScenarios": {
+    "validCredentials": {
+      "email": "Omarr3@gmail.com",
+      "password": "omar1234",
+      "expectedOutcome": "success",
+      "expectedUserName": "Omar3"
+    },
+    "invalidCredentials": {
+      "email": "ddOmarr3@gmail.com",
+      "password": "ddomar1234",
+      "expectedOutcome": "error"
+    }
   }
 }

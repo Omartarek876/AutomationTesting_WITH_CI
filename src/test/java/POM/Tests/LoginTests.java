@@ -1,53 +1,97 @@
 package POM.Tests;
 
-import POM.pages.*;
-import io.qameta.allure.*;
-import org.testng.annotations.*;
+import POM.pages.HomePage;
+import POM.pages.LoginPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 import utils.DriverFactory;
 import utils.JsonFileManager;
 
+import java.util.Map;
+
 @Listeners(utils.TestNgListener.class)
-@Feature("Login Feature")
+@Feature("Login")
+@Story("Sign in with valid and invalid credentials")
 public class LoginTests {
-    JsonFileManager jsonData;
-
-    @Test(description = "Login with valid email and password")
-    @Description("TC02 - Login with valid email and password")
-    @Severity(SeverityLevel.CRITICAL)
-    public void TC02_LoginWithCorrectEmailAndPassword() {
-        new LoginPage()
-                .userLogin(jsonData.getTestData("$.validLogin.email"), jsonData.getTestData("$.validLogin.password"));
-        new HomePage().
-                assertOnExpectedLoggedInUser(jsonData.getTestData("$.validLogin.userName"));
-    }
-
-    @Test(description = "Login with incorrect email and password")
-    @Description("TC03 - Login with invalid email and password")
-    public void TC03_LoginWithIncorrectEmailAndPassword() {
-        new LoginPage()
-                .userLogin(jsonData.getTestData("$.invalidLogin.email"), jsonData.getTestData("$.invalidLogin.password"))
-                .assertOnInvalidLoginErrorMessage("Your email or password is incorrect!");
-    }
+    private JsonFileManager loginData;
+    private JsonFileManager uiMessages;
+    private Map<String, Object> loginScenarios;
 
     @BeforeClass
-    public void setup() {
-        jsonData = new JsonFileManager("src/test/resources/loginTestData.json");
+    public void loadTestData() {
+        loginData = new JsonFileManager("loginTestData.json");
+        uiMessages = new JsonFileManager("uiMessages.json");
+        loginScenarios = loginData.getObject("$.loginScenarios");
     }
 
+    @DataProvider(name = "loginScenarios")
+    public Object[][] loginScenarios() {
+        return loginScenarios.keySet().stream()
+                .map(scenarioName -> new Object[]{scenarioName})
+                .toArray(Object[][]::new);
+    }
+
+    @Test(dataProvider = "loginScenarios", description = "Verify each JSON-defined login outcome")
+    @Description("Submits every login scenario from loginTestData.json and checks the expected page result.")
+    @Severity(SeverityLevel.CRITICAL)
+    public void loginMatchesExpectedOutcome(String scenarioName) {
+        Map<String, Object> scenario = scenarioFor(scenarioName);
+
+        new LoginPage().userLogin(
+                requiredValue(scenario, "email", scenarioName),
+                requiredValue(scenario, "password", scenarioName));
+
+        switch (requiredValue(scenario, "expectedOutcome", scenarioName)) {
+            case "success" -> new HomePage().assertOnExpectedLoggedInUser(
+                    requiredValue(scenario, "expectedUserName", scenarioName));
+            case "error" -> new LoginPage().assertOnInvalidLoginErrorMessage(
+                    uiMessages.getTestData("$.login.invalidCredentials"));
+            default -> throw new IllegalArgumentException(
+                    "Unsupported expected login outcome in scenario: " + scenarioName);
+        }
+    }
 
     @BeforeMethod
-    public void beforeMethod() {
+    public void openLoginForm() {
         DriverFactory.InitializeDriver();
         new HomePage()
                 .navigate(System.getProperty("baseUrl"))
-                .assertOnPageTitles("Automation", "Full-Fledged practice website for Automation Engineers")
+                .assertOnPageTitles(
+                        uiMessages.getTestData("$.home.title"),
+                        uiMessages.getTestData("$.home.subtitle"))
                 .clickOnLoginButton();
-        new LoginPage()
-                .assertOnLoginFormTitle("Login to your account");
+        new LoginPage().assertOnLoginFormTitle(uiMessages.getTestData("$.login.formTitle"));
     }
 
     @AfterMethod
-    public void afterMethod() {
+    public void closeBrowser() {
         DriverFactory.quitDriver();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> scenarioFor(String scenarioName) {
+        Object value = loginScenarios.get(scenarioName);
+        if (value instanceof Map<?, ?>) {
+            return (Map<String, Object>) value;
+        }
+        throw new IllegalArgumentException("No login scenario is configured for: " + scenarioName);
+    }
+
+    private String requiredValue(Map<String, Object> scenario, String key, String scenarioName) {
+        Object rawValue = scenario.get(key);
+        if (rawValue == null || String.valueOf(rawValue).isBlank()) {
+            throw new IllegalArgumentException(
+                    "Missing '" + key + "' in login scenario: " + scenarioName);
+        }
+        return String.valueOf(rawValue);
     }
 }
