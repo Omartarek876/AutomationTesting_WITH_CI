@@ -1,6 +1,5 @@
 package utils;
 
-import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 public class DriverFactory {
 
-    private static WebDriver driver;
+    private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
 
     public static void InitializeDriver() {
         InitializeDriver(System.getProperty("browser"), Boolean.parseBoolean(System.getProperty("headless")), Boolean.parseBoolean(System.getProperty("windowMaximize")));
@@ -24,6 +23,10 @@ public class DriverFactory {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2); // block images
         prefs.put("profile.managed_default_content_settings.ads", 2);    // block ads
+        if (browser == null || browser.isBlank()) {
+            throw new IllegalArgumentException("Browser must be configured with the 'browser' system property");
+        }
+        WebDriver driver;
         switch (browser.toLowerCase().trim()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
@@ -34,7 +37,6 @@ public class DriverFactory {
 
             case "firefox":
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
-//                firefoxOptions.setExperimentalOption("prefs", prefs);
                 if (headless) firefoxOptions.addArguments("--headless");
                 driver = new FirefoxDriver(firefoxOptions);
                 break;
@@ -49,17 +51,22 @@ public class DriverFactory {
             default:
                 throw new IllegalArgumentException("Browser not supported: " + browser);
         }
-        if (maximizeWindow) {
+        DRIVER.set(driver);
+        if (maximizeWindow && !headless) {
             driver.manage().window().maximize();
         }
     }
 
     public static WebDriver getDriver() {
-        return driver;
+        return DRIVER.get();
     }
 
-    @Step("Quit the browser")
     public static void quitDriver() {
-        driver.quit();
+        WebDriver driver = DRIVER.get();
+        try {
+            if (driver != null) driver.quit();
+        } finally {
+            DRIVER.remove();
+        }
     }
 }

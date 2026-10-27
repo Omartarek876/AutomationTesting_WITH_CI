@@ -10,7 +10,6 @@ import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,34 +24,6 @@ public class TestNgListener implements ISuiteListener, ITestListener, IInvokedMe
     @Override
     public void onFinish(ISuite suite) {
         System.out.println("[END EXECUTION]");
-        try {
-            // Generate report using Linux-compatible command
-            String[] generateCmd = {"mvn", "allure:report"};
-            Process genProcess = new ProcessBuilder(generateCmd)
-                    .inheritIO()
-                    .start();
-            genProcess.waitFor();
-            System.out.println("Allure report generated successfully!");
-
-            String reportPath = System.getProperty("user.dir") + File.separator + "target" + File.separator + "allure-report";
-
-            // Serve report (optional)
-            File htmlFile = new File(reportPath + File.separator + "index.html");
-            if (htmlFile.exists()) {
-                if (java.awt.Desktop.isDesktopSupported()) {
-                    java.awt.Desktop.getDesktop().browse(htmlFile.toURI());
-                    System.out.println("Allure report opened in browser!");
-                } else {
-                    System.out.println("Desktop browsing not supported on this system. Open report manually at: " + htmlFile.getAbsolutePath());
-                }
-            } else {
-                System.out.println("Report file not found at: " + htmlFile.getAbsolutePath());
-            }
-            System.out.println("Allure report is being served at http://localhost:####/ (Press Ctrl+C to stop)");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -67,10 +38,16 @@ public class TestNgListener implements ISuiteListener, ITestListener, IInvokedMe
 
     @Override
     public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-        WebDriver driver = DriverFactory.getDriver();
-        if (ITestResult.FAILURE == testResult.getStatus() && driver != null) {
-            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            Allure.attachment("Failure Screenshot", new ByteArrayInputStream(screenshot));
+        if (method.isTestMethod() && ITestResult.FAILURE == testResult.getStatus()) {
+            WebDriver driver = DriverFactory.getDriver();
+            if (driver instanceof TakesScreenshot screenshotDriver) {
+                try {
+                    byte[] screenshot = screenshotDriver.getScreenshotAs(OutputType.BYTES);
+                    Allure.attachment("Failure Screenshot", new ByteArrayInputStream(screenshot));
+                } catch (RuntimeException e) {
+                    System.err.println("Could not capture failure screenshot: " + e.getMessage());
+                }
+            }
         }
     }
 

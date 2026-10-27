@@ -31,7 +31,7 @@ public class Validations {
 
     @Step("Assert element is NOT visible")
     public static void assertElementIsNotVisible(By locator) {
-        Assert.assertFalse(ElementActions.getElement(locator).isDisplayed(),"Expected element to be hidden but it was visible: " + locator);
+        Assert.assertTrue(WaitUtils.waitForInvisibility(locator), "Expected element to be hidden or absent: " + locator);
     }
 
     /* -------------------- ENABLE / DISABLE VALIDATIONS -------------------- */
@@ -51,7 +51,7 @@ public class Validations {
     @Step("Assert required field error message equals [{expectedMessage}]")
     public static void assertRequiredFieldError(By locator, String expectedMessage) {
         String actualMessage = ElementActions.getText(locator);
-        Assert.assertEquals(ElementActions.getText(locator),expectedMessage,"Required field error message mismatch");
+        Assert.assertEquals(actualMessage, expectedMessage, "Required field error message mismatch");
     }
 
     /* -------------------- ATTRIBUTE VALIDATIONS -------------------- */

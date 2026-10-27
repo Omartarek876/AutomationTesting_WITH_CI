@@ -12,7 +12,13 @@ public class WaitUtils {
 
 
     private static WebDriver driver(){
-        return DriverFactory.getDriver();
+        WebDriver currentDriver = DriverFactory.getDriver();
+        if (currentDriver == null) throw new IllegalStateException("WebDriver has not been initialized for this test thread");
+        return currentDriver;
+    }
+
+    private static int timeoutSeconds() {
+        return Integer.parseInt(System.getProperty("waitTimeOutSeconds", "30"));
     }
 
     public static void setImplicitWait(int timeoutSeconds) {
@@ -20,27 +26,27 @@ public class WaitUtils {
     }
 
     public static WebElement waitForVisibility(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds"))));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
     public static WebElement waitForClickability(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds"))));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()));
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     public static WebElement waitForPresence(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds"))));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()));
         return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
     public static boolean waitForTextToBePresent(By locator, String text) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds"))));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()));
         return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
     }
 
     public static boolean waitForInvisibility(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(Integer.parseInt(System.getProperty("waitTimeOutSeconds"))));
+        WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()));
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
 
