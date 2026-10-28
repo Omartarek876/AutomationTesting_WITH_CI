@@ -1,4 +1,4 @@
-package utils;
+package com.automationexercise.framework.browser;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,13 +13,13 @@ import java.util.Map;
 
 public class DriverFactory {
 
-    private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
+    private static WebDriver driver;
 
-    public static void InitializeDriver() {
-        InitializeDriver(System.getProperty("browser"), Boolean.parseBoolean(System.getProperty("headless")), Boolean.parseBoolean(System.getProperty("windowMaximize")));
+    public static void initializeDriver() {
+        initializeDriver(System.getProperty("browser"), Boolean.parseBoolean(System.getProperty("headless")), Boolean.parseBoolean(System.getProperty("windowMaximize")));
     }
 
-    public static void InitializeDriver(String browser, boolean headless, boolean maximizeWindow) {
+    public static void initializeDriver(String browser, boolean headless, boolean maximizeWindow) {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2); // block images
         prefs.put("profile.managed_default_content_settings.ads", 2);    // block ads
@@ -51,22 +51,21 @@ public class DriverFactory {
             default:
                 throw new IllegalArgumentException("Browser not supported: " + browser);
         }
-        DRIVER.set(driver);
+        DriverFactory.driver = driver;
         if (maximizeWindow && !headless) {
             driver.manage().window().maximize();
         }
     }
 
     public static WebDriver getDriver() {
-        return DRIVER.get();
+        return driver;
     }
 
     public static void quitDriver() {
-        WebDriver driver = DRIVER.get();
         try {
             if (driver != null) driver.quit();
         } finally {
-            DRIVER.remove();
+            driver = null;
         }
     }
 }

@@ -91,7 +91,7 @@
                     <properties>
                         <property>
                             <name>listener</name>
-                            <value>utils.TestNgListener</value>
+                            <value>com.automationexercise.support.TestNgListener</value>
                         </property>
                     </properties>
                 </configuration>

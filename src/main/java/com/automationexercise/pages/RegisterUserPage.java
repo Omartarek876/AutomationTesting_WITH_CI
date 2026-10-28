@@ -1,17 +1,17 @@
-package POM.pages;
+package com.automationexercise.pages;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.testng.Assert;
-import utils.ElementActions;
+import com.automationexercise.framework.elements.ElementActions;
 
 public class RegisterUserPage {
 
-    private By signupFormTitle1 = By.xpath("//div[@class='signup-form']//h2");
-    private By signupFormTitle2 = By.xpath("//div[@class='login-form']/h2[@class='title text-center']/b");
-    private By userNameField = By.xpath("//input[@data-qa='signup-name']");
-    private By emailField = By.xpath("//input[@data-qa='signup-email']");
-    private By signupButton = By.xpath("//button[@data-qa='signup-button']");
+    private static final By SIGNUP_FORM_TITLE = By.xpath("//div[@class='signup-form']//h2");
+    private static final By ACCOUNT_INFORMATION_TITLE = By.xpath("//div[@class='login-form']/h2[@class='title text-center']/b");
+    private static final By USERNAME_FIELD = By.xpath("//input[@data-qa='signup-name']");
+    private static final By EMAIL_FIELD = By.xpath("//input[@data-qa='signup-email']");
+    private static final By SIGNUP_BUTTON = By.xpath("//button[@data-qa='signup-button']");
     private By mrTitleRadio = By.id("id_gender1");
     private By mrsTitleRadio = By.id("id_gender2");
     private By passwordInput = By.id("password");
@@ -36,9 +36,9 @@ public class RegisterUserPage {
 
     @Step("Submit the initial signup details")
     public RegisterUserPage signupUser(String userName, String email) {
-        ElementActions.typeText(userNameField, userName);
-        ElementActions.typeText(emailField, email);
-        ElementActions.clickElement(signupButton);
+        ElementActions.typeText(USERNAME_FIELD, userName);
+        ElementActions.typeText(EMAIL_FIELD, email);
+        ElementActions.clickElement(SIGNUP_BUTTON);
         return this;
     }
 
@@ -109,7 +109,7 @@ public class RegisterUserPage {
     @Step("Verify the signup form heading")
     public RegisterUserPage assertOnSignupFormTitle1(String signupTitle1) {
         Assert.assertEquals(
-                ElementActions.getText(signupFormTitle1), signupTitle1,
+                ElementActions.getText(SIGNUP_FORM_TITLE), signupTitle1,
                 "Signup form heading did not match the expected text");
         return this;
     }
@@ -117,7 +117,7 @@ public class RegisterUserPage {
     @Step("Verify the account-information heading")
     public RegisterUserPage assertOnSignupFormTitle2(String signupTitle2) {
         Assert.assertEquals(
-                ElementActions.getText(signupFormTitle2), signupTitle2,
+                ElementActions.getText(ACCOUNT_INFORMATION_TITLE), signupTitle2,
                 "Account-information heading did not match the expected text");
         return this;
     }
