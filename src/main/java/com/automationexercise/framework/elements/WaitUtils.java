@@ -28,4 +28,24 @@ public class WaitUtils {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
+    public static WebElement waitForClickability(By locator) {
+        return new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()))
+                .until(ExpectedConditions.elementToBeClickable(locator));
+    }
+
+    public static WebElement waitForPresence(By locator) {
+        return new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()))
+                .until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    public static boolean waitForTextToBePresent(By locator, String text) {
+        return new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()))
+                .until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+
+    public static boolean waitForInvisibility(By locator) {
+        return new WebDriverWait(driver(), Duration.ofSeconds(timeoutSeconds()))
+                .until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
 }
