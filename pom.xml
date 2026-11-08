@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.50.0</version>
+            <version>4.52.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -91,7 +91,7 @@
                     <properties>
                         <property>
                             <name>listener</name>
-                            <value>com.automationexercise.support.TestNgListener</value>
+                            <value>utils.TestNgListener</value>
                         </property>
                     </properties>
                 </configuration>

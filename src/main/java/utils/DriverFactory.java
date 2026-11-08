@@ -1,5 +1,6 @@
-package com.automationexercise.framework.browser;
+package utils;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -10,24 +11,27 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Locale;
 
 public class DriverFactory {
 
-    private static WebDriver driver;
+    private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
 
-    public static void initializeDriver() {
-        initializeDriver(System.getProperty("browser"), Boolean.parseBoolean(System.getProperty("headless")), Boolean.parseBoolean(System.getProperty("windowMaximize")));
+    public static void InitializeDriver() {
+        PropertiesReader.loadProperties();
+        InitializeDriver(System.getProperty("browser"), Boolean.parseBoolean(System.getProperty("headless")), Boolean.parseBoolean(System.getProperty("windowMaximize")));
     }
 
-    public static void initializeDriver(String browser, boolean headless, boolean maximizeWindow) {
+    public static void InitializeDriver(String browser, boolean headless, boolean maximizeWindow) {
+        if (browser == null || browser.isBlank()) {
+            throw new IllegalArgumentException("Browser must be configured (chrome, firefox, or edge)");
+        }
+        quitDriver();
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2); // block images
         prefs.put("profile.managed_default_content_settings.ads", 2);    // block ads
-        if (browser == null || browser.isBlank()) {
-            throw new IllegalArgumentException("Browser must be configured with the 'browser' system property");
-        }
         WebDriver driver;
-        switch (browser.toLowerCase().trim()) {
+        switch (browser.toLowerCase(Locale.ROOT).trim()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.setExperimentalOption("prefs", prefs);
@@ -37,6 +41,7 @@ public class DriverFactory {
 
             case "firefox":
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
+//                firefoxOptions.setExperimentalOption("prefs", prefs);
                 if (headless) firefoxOptions.addArguments("--headless");
                 driver = new FirefoxDriver(firefoxOptions);
                 break;
@@ -51,21 +56,25 @@ public class DriverFactory {
             default:
                 throw new IllegalArgumentException("Browser not supported: " + browser);
         }
-        DriverFactory.driver = driver;
-        if (maximizeWindow && !headless) {
+        DRIVER.set(driver);
+        if (maximizeWindow) {
             driver.manage().window().maximize();
         }
     }
 
     public static WebDriver getDriver() {
-        return driver;
+        return DRIVER.get();
     }
 
+    @Step("Quit the browser")
     public static void quitDriver() {
-        try {
-            if (driver != null) driver.quit();
-        } finally {
-            driver = null;
+        WebDriver driver = DRIVER.get();
+        if (driver != null) {
+            try {
+                driver.quit();
+            } finally {
+                DRIVER.remove();
+            }
         }
     }
 }
