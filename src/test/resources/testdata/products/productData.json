@@ -1,0 +1,14 @@
+{
+  "searchQuery": "men",
+  "cartSearchQuery": "women",
+  "productIds": ["1", "2"],
+  "singleProductId": "1",
+  "quantity": "4",
+  "categories": ["Women", "Men", "Kids"],
+  "categoryPaths": [
+    {"category": "Men", "subcategory": "Jeans", "heading": "MEN - JEANS PRODUCTS"},
+    {"category": "Women", "subcategory": "Dress", "heading": "WOMEN - DRESS PRODUCTS"}
+  ],
+  "brands": ["Madame", "Polo"],
+  "recommendedProductIds": ["2"]
+}
