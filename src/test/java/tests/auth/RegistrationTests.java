@@ -31,6 +31,8 @@ public class RegistrationTests {
     private JsonFileManager storefrontMessages;
     private boolean accountCreated;
     private String registeredUserName;
+    private String registeredEmail;
+    private String registeredPassword;
 
     @Test(description = "Register a new user and verify the account can be deleted")
     @Description("Create a new account, verify the confirmation and logged-in user, then remove the account.")
@@ -41,10 +43,11 @@ public class RegistrationTests {
                 registrationData.getTestData("$.userData.userName"),
                 timestamp
         );
-        String registeredEmail = TestDataFactory.timestampedEmail(
+        registeredEmail = TestDataFactory.timestampedEmail(
                 registrationData.getTestData("$.userData.email"),
                 timestamp
         );
+        registeredPassword = registrationData.getTestData("$.userData.password");
 
         registerUserPage = signupLoginPage.startRegistration(
                 registeredUserName,
@@ -56,7 +59,7 @@ public class RegistrationTests {
 
         registerUserPage.fillAccountInformation(
                 registrationData.getTestData("$.userData.title"),
-                registrationData.getTestData("$.userData.password"),
+                registeredPassword,
                 registrationData.getTestData("$.userData.day"),
                 registrationData.getTestData("$.userData.month"),
                 registrationData.getTestData("$.userData.year"),
@@ -86,7 +89,7 @@ public class RegistrationTests {
     @Test(description = "Attempt to register with an email that is already registered")
     @Description("Submit a previously registered email and verify the duplicate-email message.")
     @Severity(SeverityLevel.NORMAL)
-    public void registerWithExistingEmail_displaysDuplicateEmailError() {
+    public void registerWithExistingEmail() {
         signupLoginPage.startRegistration(
                 registrationData.getTestData("$.existingUserData.userName"),
                 registrationData.getTestData("$.existingUserData.email")
@@ -97,7 +100,7 @@ public class RegistrationTests {
     @Test(description = "Attempt to register with required signup fields missing")
     @Description("Submit the signup form empty and verify browser validation blocks submission.")
     @Severity(SeverityLevel.NORMAL)
-    public void signupWithMissingRequiredFields_showsValidation() {
+    public void signupWithMissingRequiredFields() {
         signupLoginPage.submitSignupWithMissingRequiredFields();
     }
 
@@ -130,6 +133,13 @@ public class RegistrationTests {
     public void deleteCreatedAccountAndCloseBrowser() {
         try {
             if (accountCreated) {
+                if (!homePage.isLoggedIn()) {
+                    homePage.navigateTo(System.getProperty("baseUrl"))
+                            .openSignupLoginPage()
+                            .loginWithCredentials(registeredEmail, registeredPassword);
+                    homePage = new HomePage();
+                    homePage.assertLoggedInAs(registeredUserName);
+                }
                 AccountDeletedPage deletedPage = homePage.clickDeleteAccountButton();
                 deletedPage.assertAccountDeleted(registrationMessages.getTestData("$.accountDeleted"));
                 deletedPage.continueToHomePage();
