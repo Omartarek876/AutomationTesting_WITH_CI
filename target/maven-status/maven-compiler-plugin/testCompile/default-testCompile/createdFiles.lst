@@ -1,2 +1,9 @@
-POM\Tests\LoginTests.class
-POM\Tests\RegisterTests.class
+tests\cart\CartTests.class
+support\TestDataFactory.class
+tests\storefront\StorefrontSubscriptionTests.class
+tests\contact\ContactUsTests.class
+tests\auth\LoginTests.class
+tests\products\ProductCatalogTests.class
+tests\auth\RegistrationTests.class
+tests\checkout\CheckoutTests.class
+tests\products\ProductDetailsTests.class

@@ -1,2 +1,9 @@
-D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\POM\Tests\LoginTests.java
-D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\POM\Tests\RegisterTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\support\TestDataFactory.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\auth\LoginTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\auth\RegistrationTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\cart\CartTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\checkout\CheckoutTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\contact\ContactUsTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\products\ProductCatalogTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\products\ProductDetailsTests.java
+D:\courses\03-DevOps\AutomationTesting_WITH_CI_GithubActions\src\test\java\tests\storefront\StorefrontSubscriptionTests.java
