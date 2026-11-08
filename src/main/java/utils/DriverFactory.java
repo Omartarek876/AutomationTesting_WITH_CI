@@ -30,6 +30,12 @@ public class DriverFactory {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2); // block images
         prefs.put("profile.managed_default_content_settings.ads", 2);    // block ads
+        String downloadDirectory = System.getProperty("download.dir");
+        if (downloadDirectory != null && !downloadDirectory.isBlank()) {
+            prefs.put("download.default_directory", downloadDirectory);
+            prefs.put("download.prompt_for_download", false);
+            prefs.put("safebrowsing.enabled", true);
+        }
         WebDriver driver;
         switch (browser.toLowerCase(Locale.ROOT).trim()) {
             case "chrome":
