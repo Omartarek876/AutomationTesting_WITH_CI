@@ -25,7 +25,7 @@ public class StorefrontSubscriptionTests {
     @Test(description = "Subscribe to the storefront with a valid email")
     @Description("Subscribe using a valid email address and verify the success message in the footer.")
     @Severity(SeverityLevel.NORMAL)
-    public void subscribeWithValidEmail_displaysSuccessMessage() {
+    public void subscribeWithValidEmail() {
         StorefrontPage storefrontPage = new StorefrontPage().scrollToFooter();
         Assert.assertEquals(storefrontPage.getSubscriptionHeading(),
                 storefrontMessages.getTestData("$.subscriptionHeading"));

@@ -28,7 +28,7 @@ public class ProductCatalogTests {
     @Test(description = "Search products and verify matching results")
     @Description("Search the catalog and confirm the heading and returned product names match the query.")
     @Severity(SeverityLevel.CRITICAL)
-    public void searchProductsWithMatchingQuery_displaysMatchingResults() {
+    public void searchProductsWithMatchingQuery() {
         String query = productData.getTestData("$.searchQuery");
 
         new StorefrontPage()
@@ -41,7 +41,7 @@ public class ProductCatalogTests {
     @Test(description = "Filter products by category")
     @Description("Open a configured category and subcategory and verify the resulting category heading.")
     @Severity(SeverityLevel.NORMAL)
-    public void filterProductsByCategory_displaysCategoryHeading() {
+    public void filterProductsByCategory() {
         String category = productData.getTestData("$.categoryPaths[0].category");
         String subcategory = productData.getTestData("$.categoryPaths[0].subcategory");
         String expectedHeading = productData.getTestData("$.categoryPaths[0].heading");
@@ -59,7 +59,7 @@ public class ProductCatalogTests {
     @Test(description = "Filter products by brand")
     @Description("Open a configured brand and verify that its name appears in the product heading.")
     @Severity(SeverityLevel.NORMAL)
-    public void filterProductsByBrand_displaysBrandHeading() {
+    public void filterProductsByBrand() {
         String brand = productData.getTestData("$.brands[0]");
         new StorefrontPage().openProductsPage();
         new StorefrontPage().openBrandPage(brand);

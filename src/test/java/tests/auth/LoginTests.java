@@ -22,7 +22,7 @@ public class LoginTests {
     @Test(description = "Login with valid email and password")
     @Description("Sign in with valid credentials and verify the logged-in username.")
     @Severity(SeverityLevel.CRITICAL)
-    public void loginWithValidCredentials_displaysLoggedInUser() {
+    public void loginWithValidCredentials() {
         new SignupLoginPage()
                 .loginWithCredentials(
                         loginData.getTestData("$.loginScenarios.validCredentials.email"),
@@ -35,7 +35,7 @@ public class LoginTests {
 
     @Test(description = "Login with incorrect email and password")
     @Description("Submit invalid credentials and verify the login error message.")
-    public void loginWithInvalidCredentials_displaysError() {
+    public void loginWithInvalidCredentials() {
         new SignupLoginPage()
                 .loginWithCredentials(
                         loginData.getTestData("$.loginScenarios.invalidCredentials.email"),
@@ -47,7 +47,7 @@ public class LoginTests {
     @Test(description = "Log out after a successful login")
     @Description("Sign in with valid credentials, log out, and verify the login form is displayed again.")
     @Severity(SeverityLevel.CRITICAL)
-    public void logoutAfterLogin_returnsToLoginPage() {
+    public void logoutAfterLogin() {
         new SignupLoginPage()
                 .loginWithCredentials(
                         loginData.getTestData("$.loginScenarios.validCredentials.email"),

@@ -31,7 +31,7 @@ public class ProductDetailsTests {
     @Test(description = "Open a product and verify its details")
     @Description("Open the configured product and verify its displayed name and price.")
     @Severity(SeverityLevel.NORMAL)
-    public void openProductDetails_displaysExpectedProductInformation() {
+    public void openProductDetails() {
         Assert.assertEquals(
                 productDetailsPage.getProductName(),
                 productMessages.getTestData("$.productBlueTop")
@@ -45,7 +45,7 @@ public class ProductDetailsTests {
     @Test(description = "Submit a review for a product")
     @Description("Submit a product review with unique run data and verify the confirmation message.")
     @Severity(SeverityLevel.NORMAL)
-    public void submitProductReview_displaysConfirmation() {
+    public void submitProductReview() {
         String timestamp = TestDataFactory.timestampSuffix();
         String name = TestDataFactory.timestampedValue(reviewData.getTestData("$.name"), timestamp);
         String email = TestDataFactory.timestampedEmail(reviewData.getTestData("$.email"), timestamp);

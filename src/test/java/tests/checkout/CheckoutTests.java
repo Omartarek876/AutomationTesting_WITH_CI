@@ -45,7 +45,7 @@ public class CheckoutTests {
     @Test(description = "Guest checkout prompts user to log in or sign up")
     @Description("Add an item as a guest, proceed to checkout, and verify the login or signup prompt appears.")
     @Severity(SeverityLevel.NORMAL)
-    public void checkoutAsGuest_promptsUserToLogInOrSignUp() {
+    public void checkoutAsGuest() {
         addProductToCart().proceedToCheckout()
                 .assertGuestCheckoutPrompt(checkoutMessages.getTestData("$.guestCheckoutPrompt"));
     }
@@ -53,7 +53,7 @@ public class CheckoutTests {
     @Test(description = "Logged-in checkout displays delivery and billing addresses")
     @Description("Create a user, proceed to checkout, and verify both displayed addresses match the account details.")
     @Severity(SeverityLevel.NORMAL)
-    public void checkoutAsLoggedInUser_displaysDeliveryAndBillingAddresses() {
+    public void checkoutAsLoggedInUser() {
         registerCheckoutUser();
         CheckoutPage checkoutPage = addProductToCart().proceedToCheckout();
 
@@ -64,7 +64,7 @@ public class CheckoutTests {
     @Test(description = "Place an order using valid payment details")
     @Description("Create a user, place an order using the configured payment data, and verify order confirmation.")
     @Severity(SeverityLevel.CRITICAL)
-    public void placeOrderWithValidPayment_displaysSuccessConfirmation() {
+    public void placeOrderWithValidPayment() {
         CheckoutPage confirmationPage = placeConfiguredOrder();
         Assert.assertTrue(confirmationPage.getPaymentSuccessMessage()
                         .contains(checkoutMessages.getTestData("$.paymentSuccess")),
@@ -74,7 +74,7 @@ public class CheckoutTests {
     @Test(description = "Download an invoice after a successful order")
     @Description("Place a successful order, download its invoice, and verify a file appears in the configured download folder.")
     @Severity(SeverityLevel.NORMAL)
-    public void downloadInvoice_afterSuccessfulOrder_downloadsInvoice() throws IOException, InterruptedException {
+    public void downloadInvoice() throws IOException, InterruptedException {
         CheckoutPage confirmationPage = placeConfiguredOrder();
         Assert.assertTrue(confirmationPage.getPaymentSuccessMessage()
                         .contains(checkoutMessages.getTestData("$.paymentSuccess")),

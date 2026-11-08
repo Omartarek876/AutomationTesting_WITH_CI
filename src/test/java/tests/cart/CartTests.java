@@ -31,7 +31,7 @@ public class CartTests {
     @Test(description = "Add one product to the cart")
     @Description("Add a product from the product list and verify it is displayed in the cart.")
     @Severity(SeverityLevel.NORMAL)
-    public void addSingleProductToCart_displaysCorrectProduct() {
+    public void addSingleProductToCart() {
         String productId = cartData.getTestData("$.singleProductId");
         ProductsPage productsPage = new StorefrontPage().openProductsPage();
         String productName = productsPage.openProductDetails(productId).getProductName();
@@ -45,7 +45,7 @@ public class CartTests {
     @Test(description = "Set product quantity and verify the cart total")
     @Description("Set a product quantity on its details page and verify the quantity and calculated total in the cart.")
     @Severity(SeverityLevel.NORMAL)
-    public void setProductQuantity_cartShowsExpectedQuantityAndTotal() {
+    public void setProductQuantity() {
         String productId = cartData.getTestData("$.singleProductId");
         int quantity = Integer.parseInt(cartData.getTestData("$.quantity"));
         ProductDetailsPage productDetails = new StorefrontPage().openProductsPage().openProductDetails(productId);
@@ -62,7 +62,7 @@ public class CartTests {
     @Test(description = "Open the cart without products")
     @Description("Open the cart in a fresh browser session and verify the empty-cart message.")
     @Severity(SeverityLevel.NORMAL)
-    public void openCartWithoutProducts_displaysEmptyCartMessage() {
+    public void openCartWithoutProducts() {
         CartPage cartPage = new StorefrontPage().openCartPage();
         Assert.assertTrue(cartPage.getEmptyCartMessage().contains(cartMessages.getTestData("$.emptyCart")));
     }

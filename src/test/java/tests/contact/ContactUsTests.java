@@ -27,7 +27,7 @@ public class ContactUsTests {
     @Test(description = "Submit the contact form with valid details")
     @Description("Complete the contact form with valid data and verify the confirmation message.")
     @Severity(SeverityLevel.NORMAL)
-    public void submitContactFormWithValidDetails_displaysConfirmation() {
+    public void submitContactFormWithValidDetails() {
         ContactUsPage contactPage = new StorefrontPage().openContactUsPage();
         contactPage.assertContactFormHeading(contactMessages.getTestData("$.contactHeader"));
         contactPage.submitContactForm(
