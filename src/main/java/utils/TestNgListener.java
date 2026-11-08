@@ -12,8 +12,12 @@ import org.testng.xml.XmlTest;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestNgListener implements ISuiteListener, ITestListener, IInvokedMethodListener, IAlterSuiteListener {
+    private static final AtomicInteger TEST_COUNTER = new AtomicInteger();
+    private static final String TEST_NUMBER_ATTRIBUTE = TestNgListener.class.getName() + ".testNumber";
+    private static final String TEST_FINISHED_ATTRIBUTE = TestNgListener.class.getName() + ".testFinished";
 
     @Override
     public void onStart(ISuite suite) {
@@ -29,12 +33,19 @@ public class TestNgListener implements ISuiteListener, ITestListener, IInvokedMe
 
     @Override
     public void onTestStart(ITestResult result) {
-        System.out.println("[INFO] Starting test: " + result.getName());
+        int testNumber = TEST_COUNTER.incrementAndGet();
+        result.setAttribute(TEST_NUMBER_ATTRIBUTE, testNumber);
+        System.out.println("[INFO] Starting test #" + testNumber + ": " + result.getName());
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        System.out.println("[PASS] Test passed: " + result.getName());
+        logTestFinished(result, "PASS");
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        logTestFinished(result, "FAIL");
     }
 
     @Override
@@ -61,18 +72,35 @@ public class TestNgListener implements ISuiteListener, ITestListener, IInvokedMe
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        System.out.println("[SKIP] Test skipped: " + result.getName());
+        logTestFinished(result, "SKIP");
     }
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-        System.out.println("[WARN] Test failed but within success percentage: " + result.getName());
+        logTestFinished(result, "WARN");
     }
 
     @Override
     public void onTestFailedWithTimeout(ITestResult result) {
-        System.out.println("[TIMEOUT] Test failed due to timeout: " + result.getName());
+        logTestFinished(result, "TIMEOUT");
         onTestFailure(result);
+    }
+
+    private void logTestFinished(ITestResult result, String outcome) {
+        synchronized (result) {
+            if (result.getAttribute(TEST_FINISHED_ATTRIBUTE) != null) {
+                return;
+            }
+            result.setAttribute(TEST_FINISHED_ATTRIBUTE, Boolean.TRUE);
+        }
+        Object assignedNumber = result.getAttribute(TEST_NUMBER_ATTRIBUTE);
+        int testNumber = assignedNumber instanceof Integer
+                ? (Integer) assignedNumber
+                : TEST_COUNTER.incrementAndGet();
+        if (assignedNumber == null) {
+            result.setAttribute(TEST_NUMBER_ATTRIBUTE, testNumber);
+        }
+        System.out.println("[" + outcome + "] Finished test #" + testNumber + ": " + result.getName());
     }
 
     @Override
