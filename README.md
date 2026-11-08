@@ -1,4 +1,4 @@
-# AutomationExercise UI Automation Framework
+# Automation Testing with CI Pipeline
 
 Java-based UI automation for [AutomationExercise](https://automationexercise.com/). The project demonstrates a maintainable Selenium framework built around a **fluent Page Object Model (POM) with method chaining**, data-driven TestNG scenarios, reusable browser utilities, Allure reporting, and CI configuration.
 
