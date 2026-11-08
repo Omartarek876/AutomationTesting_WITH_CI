@@ -1,0 +1,7 @@
+{
+  "signupTitle": "New User Signup!",
+  "accountInformationTitle": "ENTER ACCOUNT INFORMATION",
+  "accountCreated": "ACCOUNT CREATED!",
+  "accountDeleted": "ACCOUNT DELETED!",
+  "existingEmail": "Email Address already exist!"
+}
