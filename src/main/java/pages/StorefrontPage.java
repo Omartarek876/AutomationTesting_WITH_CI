@@ -25,8 +25,9 @@ public class StorefrontPage {
 
     @Step("Open products page")
     public ProductsPage openProductsPage() {
-        ElementActions.clickElement(By.cssSelector("a[href='/products']"));
-        return new ProductsPage();
+        BrowserUtils.dismissGoogleAdOverlayIfPresent();
+        clickThroughAdOverlay(By.cssSelector("a[href='/products']"));
+        return new ProductsPage().waitUntilLoaded();
     }
 
     @Step("Open cart page")

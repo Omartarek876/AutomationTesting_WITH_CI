@@ -2,6 +2,7 @@ package pages;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import utils.BrowserUtils;
 import utils.ElementActions;
@@ -27,6 +28,7 @@ public class HomePage {
 
     @Step("Click delete account")
     public AccountDeletedPage clickDeleteAccountButton() {
+        BrowserUtils.dismissGoogleAdOverlayIfPresent();
         ElementActions.clickElement(deleteAccountButton);
         return new AccountDeletedPage();
     }
@@ -40,7 +42,18 @@ public class HomePage {
 
     @Step("Verify logged-in username is {expectedUsername}")
     public HomePage assertLoggedInAs(String expectedUsername) {
+        BrowserUtils.dismissGoogleAdOverlayIfPresent();
         Assert.assertEquals(ElementActions.getText(loggedInUsername), expectedUsername);
         return this;
+    }
+
+    public boolean isLoggedIn() {
+        BrowserUtils.dismissGoogleAdOverlayIfPresent();
+        for (WebElement username : utils.DriverFactory.getDriver().findElements(loggedInUsername)) {
+            if (username.isDisplayed()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

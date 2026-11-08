@@ -30,6 +30,8 @@ public class DriverFactory {
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2); // block images
         prefs.put("profile.managed_default_content_settings.ads", 2);    // block ads
+        prefs.put("profile.default_content_setting_values.ads", 2);
+        prefs.put("profile.default_content_setting_values.popups", 2);
         String downloadDirectory = System.getProperty("download.dir");
         if (downloadDirectory != null && !downloadDirectory.isBlank()) {
             prefs.put("download.default_directory", downloadDirectory);

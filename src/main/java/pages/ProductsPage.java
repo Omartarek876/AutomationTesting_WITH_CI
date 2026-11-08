@@ -26,6 +26,7 @@ public class ProductsPage {
 
     @Step("Search products for {query}")
     public ProductsPage searchProducts(String query) {
+        utils.BrowserUtils.dismissGoogleAdOverlayIfPresent();
         ElementActions.typeText(searchField, query);
         ElementActions.clickElement(searchButton);
         return this;
@@ -42,6 +43,13 @@ public class ProductsPage {
     @Step("Verify product search heading")
     public ProductsPage assertSearchHeading(String expectedHeading) {
         org.testng.Assert.assertEquals(ElementActions.getText(searchHeading), expectedHeading);
+        return this;
+    }
+
+    @Step("Wait for the products search controls")
+    public ProductsPage waitUntilLoaded() {
+        utils.BrowserUtils.dismissGoogleAdOverlayIfPresent();
+        WaitUtils.waitForVisibility(searchField);
         return this;
     }
 
