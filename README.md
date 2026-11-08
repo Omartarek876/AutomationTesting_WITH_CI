@@ -1,42 +1,69 @@
 # AutomationExercise UI Automation Framework
 
-Java and Selenium UI automation for [AutomationExercise](https://automationexercise.com/), built to demonstrate maintainable test design, reusable Page Objects, browser configuration, data-driven scenarios, reporting, and continuous integration.
+Java-based UI automation for [AutomationExercise](https://automationexercise.com/). The project demonstrates a maintainable Selenium framework built around a **fluent Page Object Model (POM) with method chaining**, data-driven TestNG scenarios, reusable browser utilities, Allure reporting, and CI configuration.
 
-The framework uses **Java 21**, **Maven**, **Selenium WebDriver**, **TestNG**, and **Allure**. Tests exercise the public practice site, so results can depend on the availability and current data of that external site.
+The current suite covers authentication, registration, product catalog and details, cart, checkout, contact form, and storefront subscription flows. The suite runs against a public practice website, so results depend on the site's availability and test-account data.
 
-## What the project demonstrates
+## Contents
 
-- Page Object Model with focused page classes and fluent transitions between pages.
-- Reusable browser, element, wait, alert, configuration, validation, and JSON data utilities.
-- TestNG lifecycle hooks, scenario descriptions, feature labels, severity labels, and failure screenshots.
-- JSON-based test data and expected messages, organized by feature.
-- GitHub Actions execution on pushes, pull requests, and manual dispatch.
+- [Technology stack](#technology-stack)
+- [Automated coverage](#automated-coverage)
+- [Architecture](#architecture)
+  - [Fluent Page Objects and method chaining](#fluent-page-objects-and-method-chaining)
+  - [Shared framework utilities](#shared-framework-utilities)
+- [Project structure](#project-structure)
+- [Requirements](#requirements)
+- [Run the suite](#run-the-suite)
+- [Allure report](#allure-report)
+- [CI configuration](#ci-configuration)
 
-## Current test coverage
+## Technology stack
 
-| Area | Automated scenarios |
-| --- | --- |
-| Login | Valid credentials, invalid credentials, and logout |
-| Registration | Successful account creation and cleanup, duplicate email, and required-field validation |
-| Product catalog | Search results, category filtering, and brand filtering |
-| Product details | Product name and price, and review submission |
-| Cart | Single and multiple products, quantity and total calculation, and empty-cart state |
-
-The page objects also provide reusable actions for checkout, contact form, subscriptions, product recommendations, and other storefront flows. These are framework capabilities; they are not all covered by automated tests yet.
-
-## Technology
-
-| Component | Version / role |
+| Technology | Version / use |
 | --- | --- |
 | Java | 21 |
 | Maven | Build and dependency management |
 | Selenium WebDriver | 4.52.0; browser automation |
 | TestNG | 7.11.0; test execution and lifecycle |
 | Allure TestNG | 3.0.0; test results and reporting |
-| JsonPath | 2.10.0; reading JSON test data |
+| JsonPath | 2.10.0; JSON test-data queries |
 | JSON Simple | 1.1.1; JSON parsing |
 | AspectJ Weaver | 1.9.25; Allure instrumentation |
-| GitHub Actions | CI workflow in `.github/workflows/CI.yml` |
+
+## Automated coverage
+
+| Feature | Scenarios |
+| --- | --- |
+| Login | Valid credentials, invalid credentials, logout |
+| Registration | Successful registration and account cleanup, duplicate email, missing required fields |
+| Product catalog | Search results, category filtering, brand filtering |
+| Product details | Verify product name and price, submit a product review |
+| Cart | Add a product, set quantity and verify total, open an empty cart |
+| Checkout | Guest checkout prompt, logged-in delivery and billing addresses, successful payment, invoice download |
+| Contact | Submit the contact form with valid details and file upload |
+| Storefront | Subscribe with a valid email |
+
+At the time these screenshots were supplied, the Allure run contained **20 test cases with a 100% pass rate**. This is a saved execution result, not a live CI status indicator.
+
+## Architecture
+
+### Fluent Page Objects and method chaining
+
+- `HomePage` and `StorefrontPage` model the home page and shared storefront navigation.
+- `SignupLoginPage`, `LoginPage`, and `RegisterUserPage` model the signup, login, and registration steps. `AccountCreatedPage` and `AccountDeletedPage` model their confirmation states.
+- `ProductsPage` and `ProductDetailsPage` separate catalog actions from product-detail actions.
+- `CartPage`, `CheckoutPage`, and `ContactUsPage` model cart, order, payment, and contact-form workflows.
+
+The Page Object Model uses a fluent design and method chaining: page actions return the current page object, while navigation actions return the destination page object. This keeps test flows readable and makes page transitions explicit.
+
+### Shared framework utilities
+
+- `DriverFactory` creates and manages Chrome, Firefox, or Edge sessions.
+- `BrowserUtils`, `ElementActions`, and `WaitUtils` provide navigation, common element interactions, and explicit waits.
+- `AlertActions` handles browser alerts; `Validations` contains reusable UI checks.
+- `PropertiesReader` loads configuration defaults, and `JsonFileManager` reads JSON values by JsonPath.
+- `TestNgListener` loads defaults at suite start, logs test outcomes, attaches failure screenshots to Allure, and generates the Allure report after execution.
+- `TestDataFactory` creates unique timestamped values for tests such as registration and product reviews.
 
 ## Project structure
 
@@ -44,113 +71,118 @@ The page objects also provide reusable actions for checkout, contact form, subsc
 .
 ├── .github/
 │   └── workflows/
-│       └── CI.yml                         # GitHub Actions test and report workflow
+│       └── CI.yml.txt                    # CI workflow definition (see CI note below)
+├── docs/
+│   └── images/
+│       ├── test-execution-console.png    # Supplied TestNG console screenshot
+│       ├── allure-overview.png           # Allure run overview
+│       ├── allure-suites.png             # Test suites and execution steps
+│       ├── allure-graphs.png             # Status, severity, and duration graphs
+│       ├── allure-packages.png           # Test package breakdown
+│       └── allure-feature-summary.png    # Feature totals
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   ├── pages/                     # Page Object Model
-│   │   │   │   ├── HomePage.java
-│   │   │   │   ├── SignupLoginPage.java
-│   │   │   │   ├── LoginPage.java
-│   │   │   │   ├── RegisterUserPage.java
-│   │   │   │   ├── AccountCreatedPage.java
-│   │   │   │   ├── AccountDeletedPage.java
-│   │   │   │   ├── StorefrontPage.java
-│   │   │   │   ├── ProductsPage.java
-│   │   │   │   ├── ProductDetailsPage.java
-│   │   │   │   ├── CartPage.java
-│   │   │   │   ├── CheckoutPage.java
-│   │   │   │   └── ContactUsPage.java
-│   │   │   └── utils/                      # Driver, browser, actions, waits, config, JSON, listener
+│   │   │   ├── pages/                    # Fluent page classes with method chaining
+│   │   │   └── utils/                    # Driver, actions, waits, config, data, listener
 │   │   └── resources/
-│   │       ├── environment.properties      # Base URL and browser defaults
-│   │       └── execution.properties       # Execution defaults
+│   │       ├── environment.properties     # Base URL and browser settings
+│   │       └── execution.properties      # Wait and execution settings
 │   └── test/
 │       ├── java/
-│       │   ├── tests/
-│       │   │   ├── auth/                   # Login and registration tests
-│       │   │   ├── cart/                   # Cart scenarios
-│       │   │   └── products/               # Catalog and product detail scenarios
-│       │   └── support/
-│       │       └── TestDataFactory.java    # Unique test input helpers
-│       └── resources/testdata/             # Feature-specific JSON data/messages
-├── pom.xml                                 # Dependencies and Maven plugins
+│       │   ├── support/                  # Test-data helpers
+│       │   └── tests/
+│       │       ├── auth/
+│       │       ├── cart/
+│       │       ├── checkout/
+│       │       ├── contact/
+│       │       ├── products/
+│       │       └── storefront/
+│       └── resources/testdata/           # Feature-specific data and messages
+├── pom.xml
 └── README.md
 ```
 
-### Framework responsibilities
-
-- **Pages** encapsulate locators, page actions, assertions, and page-to-page transitions. Action methods return the current or next page object to support readable chaining.
-- **`DriverFactory`** configures and manages the browser driver. **`BrowserUtils`** provides browser navigation, and **`ElementActions`** and **`WaitUtils`** provide common interactions and waits.
-- **`PropertiesReader`** loads bundled defaults without overriding command-line Java system properties. **`JsonFileManager`** reads JSON values using JsonPath.
-- **`TestDataFactory`** creates timestamped names and email addresses for scenarios that need unique values.
-- **`AlertActions`** handles browser alerts, **`Validations`** provides reusable checks, and **`TestNgListener`** loads configuration, logs test outcomes, captures failure screenshots for Allure, and generates the report after a suite.
-- **Test data** is separated from test logic under `src/test/resources/testdata/`, with folders for authentication, cart, checkout, contact, products, reviews, and storefront scenarios. Most feature folders include data and expected-message JSON files; contact resources also include an upload image.
+Test data is organized under `src/test/resources/testdata/` by feature: `auth/login`, `auth/registration`, `cart`, `checkout`, `contact`, `products`, `review`, and `storefront`. Most feature folders contain separate JSON files for test inputs and expected messages. Contact test data also includes the file-upload fixture.
 
 ## Requirements
 
 - JDK 21
-- Maven 3.8 or newer
+- Maven
 - Chrome, Firefox, or Microsoft Edge
 - Network access to AutomationExercise
 
-Selenium Manager resolves the browser driver when the tests start. No driver executable is stored in the repository.
+Selenium Manager resolves the browser driver when the test session starts; no driver executable is stored in the repository.
 
-## Run locally
+## Run the suite
 
-Run the TestNG suite from the repository root:
+From the repository root, run:
 
 ```bash
 mvn clean test
 ```
 
-The defaults are Chrome, headless mode enabled, window maximization disabled, and a 30-second wait timeout. Override them with Maven system properties:
+Default settings are Chrome, headless mode enabled, window maximization disabled, and a 30-second wait timeout. Override the settings with Maven system properties:
 
 ```bash
 mvn clean test -Dbrowser=firefox -Dheadless=false -DwindowMaximize=true -DwaitTimeOutSeconds=45
 ```
 
-Supported `browser` values are `chrome`, `firefox`, and `edge`. The `baseUrl` can also be overridden:
+Supported `browser` values are `chrome`, `firefox`, and `edge`. You can also override the site URL:
 
 ```bash
 mvn clean test -DbaseUrl=https://automationexercise.com/
 ```
 
-Defaults are loaded from `src/main/resources/environment.properties` and `src/main/resources/execution.properties`. Values supplied with `-D` take precedence.
+Defaults come from `src/main/resources/environment.properties` and `src/main/resources/execution.properties`. Java system properties passed with `-D` take precedence over those defaults.
 
-## Test data
+### Sample execution output
 
-Test data and expected messages are stored by feature. For example:
+This console capture was supplied with the project and shows the visible passing TestNG results from the same execution represented in the Allure report below.
 
-```text
-src/test/resources/testdata/
-├── auth/
-│   ├── login/
-│   └── registration/
-├── cart/
-├── checkout/
-├── contact/
-├── products/
-├── review/
-└── storefront/
-```
+![TestNG execution output showing passing scenarios](docs/images/test-execution-console.png)
 
-Update the relevant JSON files when adding scenarios or changing test inputs and expected UI messages. Keep account credentials and email addresses suitable for the target practice site; successful registration requires an email address that is not already registered.
+## Allure report
 
-Registration and review scenarios generate unique values from their configured JSON data to reduce collisions across repeated runs.
+TestNG and Surefire output is written to `target/surefire-reports/`. Allure results are written to `target/allure-results/`, and the generated HTML report is written to `target/allure-report/`.
 
-## Reports
-
-- Surefire and TestNG output: `target/surefire-reports/`
-- Allure raw results: `target/allure-results/`
-- Allure HTML report: `target/allure-report/`
-
-The TestNG listener generates an Allure report when a suite finishes. You can also request one manually after results have been created:
+The TestNG listener generates an Allure report after suite execution. To regenerate it manually from existing results, run:
 
 ```bash
 mvn allure:report
 ```
 
-## Continuous integration
+The local report entry point is `target/allure-report/index.html`. The `target/` directory is build output; the workflow definition includes a step to upload report outputs as an artifact.
 
-The workflow at `.github/workflows/CI.yml` runs on pushes, pull requests, and manual dispatch. It uses Ubuntu and Java 21, runs `mvn clean test`, generates an Allure report when results exist, and uploads Surefire and Allure output as the `ui-test-results` artifact for 14 days.
+### Allure report screenshots
+
+The overview shows 20 test cases and a 100% pass rate. The other views show the suite/test steps, status and severity graphs, package breakdown, and feature totals.
+
+![Allure report overview showing 20 test cases and a 100% pass rate](docs/images/allure-overview.png)
+
+<details>
+<summary>More Allure report views</summary>
+
+#### Suites and test steps
+
+![Allure suites view with passing tests and an expanded test execution](docs/images/allure-suites.png)
+
+#### Status, severity, and duration graphs
+
+![Allure graphs showing all tests passed and severity and duration distributions](docs/images/allure-graphs.png)
+
+#### Package breakdown
+
+![Allure package view showing test counts by package](docs/images/allure-packages.png)
+
+#### Feature summary
+
+![Allure feature summary showing eight feature groups and their passing test counts](docs/images/allure-feature-summary.png)
+
+</details>
+
+## CI configuration
+
+The repository includes a GitHub Actions workflow definition in `.github/workflows/CI.yml.txt`. Its configuration is set up for pushes, pull requests, and manual dispatch; Java 21 on Ubuntu; `mvn clean test`; Allure report generation; and upload of test and report artifacts for 14 days.
+
+**Activation note:** GitHub Actions discovers workflow files ending in `.yml` or `.yaml` under `.github/workflows/`. The current file has an additional `.txt` extension, so GitHub will not run it automatically until it is renamed to a supported extension. See the [GitHub Actions workflow syntax documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
